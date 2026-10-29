@@ -15,6 +15,12 @@ variable "enable_cis_logging" {
   default     = true
 }
 
+variable "enable_cis_alarms" {
+  description = "Create CIS Section 4 metric filters and alarms on the CloudTrail log group. Has no effect unless enable_cis_logging is also true."
+  type        = bool
+  default     = true
+}
+
 variable "enable_cis_iam" {
   description = "Create the account password policy, HardenedAdmins group, support role, and IAM Access Analyzer."
   type        = bool

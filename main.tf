@@ -26,6 +26,16 @@ module "logging" {
   kms_key_arn = try(module.kms[0].key_arn, null)
 }
 
+module "cloudwatch_alarms" {
+  count  = var.enable_cis_logging && var.enable_cis_alarms ? 1 : 0
+  source = "./modules/cloudwatch-alarms"
+
+  environment    = var.environment
+  account_id     = var.account_id
+  log_group_name = try(module.logging[0].log_group_name, null)
+  sns_topic_arn  = try(module.logging[0].sns_topic_arn, null)
+}
+
 module "s3_guardrails" {
   source = "./modules/s3-guardrails"
 }

@@ -1,6 +1,6 @@
 # HarderAWS
 
-Opinionated AWS security hardening as Terraform 1.5+ modules. The root module wires one submodule per control domain: IAM, logging, S3 guardrails, KMS, VPC, Config, GuardDuty, Access Analyzer, and default EBS encryption.
+Opinionated AWS security hardening as Terraform 1.5+ modules. The root module wires one submodule per control domain: IAM, logging, CloudWatch CIS alarms, S3 guardrails, KMS, VPC, Config, GuardDuty, Access Analyzer, and default EBS encryption.
 
 This is a security posture layer. It creates policies, trails, security buckets, encryption defaults, and templates. It does not create databases, instances, application buckets, or organization resources.
 
@@ -12,6 +12,7 @@ Author: Chwaee ([chwaee](https://github.com/chwaee), hello@appliedaiconsulting.i
 | --- | --- | --- |
 | `modules/iam` | Password policy, `HardenedAdmins` group, constrained admin policy, MFA deny policy, support role, SCP JSON output | 1.8, 1.9, 1.10, 1.15, 1.16, 1.17 |
 | `modules/logging` | Multi-region CloudTrail, log bucket, access-log bucket, CloudWatch log group, delivery alarm | 3.1, 3.2, 3.4, 3.5, and 2.1.1 on those buckets |
+| `modules/cloudwatch-alarms` | Metric filters and alarms for CIS Section 4 on the CloudTrail log group | 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 4.12, 4.13, 4.14, 4.15 |
 | `modules/s3-guardrails` | Account-level S3 Block Public Access, all four settings | 2.1.4 |
 | `modules/kms` | One CMK for CloudTrail, the trail log group, the delivery topic, and Config, with rotation | 3.5, 3.6 |
 | `modules/vpc` | IMDSv2 launch template, instance profile, opt-in flow logs, default security group with no rules | 1.18, 3.7, 5.4, 5.6 |
@@ -59,6 +60,7 @@ Copy `backend.tf.example` to `backend.tf` when you want remote state. Until you 
 | --- | --- | --- | --- |
 | `environment` | string | `production` | Name segment and tag. Lowercase letters, digits, and hyphens. |
 | `enable_cis_logging` | bool | `true` | CloudTrail, log buckets, log group, delivery alarm, and the CMK when Config is also off. |
+| `enable_cis_alarms` | bool | `true` | CIS 4.1–4.15 metric filters and alarms. Created only when logging is also on. |
 | `enable_cis_iam` | bool | `true` | Password policy, admin group, support role, Access Analyzer. |
 | `enable_cis_networking` | bool | `true` | IMDSv2 launch template. Flow logs and default security groups only when VPC IDs are set or discovery is on. |
 | `enable_cis_encryption` | bool | `true` | Default EBS encryption in both regions. |
@@ -83,6 +85,21 @@ The password policy sets minimum length 14, upper and lower case, numbers, symbo
 | --- | --- |
 | `cloudtrail_trail_arn` | Multi-region trail ARN. |
 | `cloudtrail_bucket_arn` | Trail log bucket ARN. |
+| `alarm_name_cis_4_1` | CIS 4.1 unauthorized API calls alarm. |
+| `alarm_name_cis_4_2` | CIS 4.2 console sign-in without MFA alarm. |
+| `alarm_name_cis_4_3` | CIS 4.3 root account use alarm. |
+| `alarm_name_cis_4_4` | CIS 4.4 IAM policy changes alarm. |
+| `alarm_name_cis_4_5` | CIS 4.5 CloudTrail configuration changes alarm. |
+| `alarm_name_cis_4_6` | CIS 4.6 console authentication failures alarm. |
+| `alarm_name_cis_4_7` | CIS 4.7 CMK disable or scheduled deletion alarm. |
+| `alarm_name_cis_4_8` | CIS 4.8 S3 bucket policy changes alarm. |
+| `alarm_name_cis_4_9` | CIS 4.9 AWS Config changes alarm. |
+| `alarm_name_cis_4_10` | CIS 4.10 security group changes alarm. |
+| `alarm_name_cis_4_11` | CIS 4.11 NACL changes alarm. |
+| `alarm_name_cis_4_12` | CIS 4.12 network gateway changes alarm. |
+| `alarm_name_cis_4_13` | CIS 4.13 route table changes alarm. |
+| `alarm_name_cis_4_14` | CIS 4.14 VPC changes alarm. |
+| `alarm_name_cis_4_15` | CIS 4.15 AWS Organizations changes alarm. |
 | `config_recorder_name` | Recorder name in us-east-1. |
 | `config_recorder_names` | Recorder names keyed by region. |
 | `guardduty_detector_id` | Detector ID in us-east-1. |
@@ -144,21 +161,21 @@ Status is **Implemented** when the stack creates the control for the regions it 
 | 3.7 | VPC flow logs in all VPCs | vpc | Partial. Opt-in by VPC ID, or `discover_vpcs`. |
 | 3.8 | S3 object-level write events | — | Not in scope |
 | 3.9 | S3 object-level read events | — | Not in scope |
-| 4.1 | Metric filter and alarm for unauthorized API calls | — | Not in scope |
-| 4.2 | Metric filter and alarm for console sign-in without MFA | — | Not in scope |
-| 4.3 | Metric filter and alarm for root account use | — | Not in scope |
-| 4.4 | Metric filter and alarm for IAM policy changes | — | Not in scope |
-| 4.5 | Metric filter and alarm for CloudTrail configuration changes | — | Not in scope |
-| 4.6 | Metric filter and alarm for console authentication failures | — | Not in scope |
-| 4.7 | Metric filter and alarm for CMK disable or scheduled deletion | — | Not in scope |
-| 4.8 | Metric filter and alarm for S3 bucket policy changes | — | Not in scope |
-| 4.9 | Metric filter and alarm for AWS Config changes | — | Not in scope |
-| 4.10 | Metric filter and alarm for security group changes | — | Not in scope |
-| 4.11 | Metric filter and alarm for NACL changes | — | Not in scope |
-| 4.12 | Metric filter and alarm for network gateway changes | — | Not in scope |
-| 4.13 | Metric filter and alarm for route table changes | — | Not in scope |
-| 4.14 | Metric filter and alarm for VPC changes | — | Not in scope |
-| 4.15 | Metric filter and alarm for AWS Organizations changes | — | Not in scope |
+| 4.1 | Metric filter and alarm for unauthorized API calls | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.2 | Metric filter and alarm for console sign-in without MFA | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.3 | Metric filter and alarm for root account use | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.4 | Metric filter and alarm for IAM policy changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.5 | Metric filter and alarm for CloudTrail configuration changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.6 | Metric filter and alarm for console authentication failures | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.7 | Metric filter and alarm for CMK disable or scheduled deletion | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.8 | Metric filter and alarm for S3 bucket policy changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.9 | Metric filter and alarm for AWS Config changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.10 | Metric filter and alarm for security group changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.11 | Metric filter and alarm for NACL changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.12 | Metric filter and alarm for network gateway changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.13 | Metric filter and alarm for route table changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.14 | Metric filter and alarm for VPC changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
+| 4.15 | Metric filter and alarm for AWS Organizations changes | cloudwatch-alarms | Partial. Metric filters and alarms in us-east-1 only. Alarms use SNS topic from logging module. |
 | 4.16 | Security Hub is enabled | — | Not in scope |
 | 5.1 | No NACL allows admin ports from 0.0.0.0/0 | — | Not in scope |
 | 5.2 | No security group allows admin ports from 0.0.0.0/0 | — | Not in scope |
@@ -183,7 +200,7 @@ The password policy also requires symbols, numbers, and both cases, and it expir
 - The Config service-linked role is global. If the account already has it, import `aws_iam_service_linked_role.config` or the home-region apply fails.
 - VPC discovery is off by default. A default apply does not change existing VPC security groups or add flow logs.
 - IAM password policy replaces the account password policy in place. It does not delete users. There is no lockout threshold to set.
-- Section 4 metric filters, S3 object-level data events, Macie, RDS, and EFS are not built.
+- CIS Section 4 alarms cover us-east-1 only. S3 object-level data events, Macie, RDS, and EFS are not built.
 - Security buckets store CloudTrail and Config data. They are not application buckets. Log storage has a cost. This stack does not tune that cost.
 
 ## Development

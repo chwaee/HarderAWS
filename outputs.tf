@@ -8,6 +8,81 @@ output "cloudtrail_bucket_arn" {
   value       = try(module.logging[0].bucket_arn, null)
 }
 
+output "alarm_name_cis_4_1" {
+  description = "Name of the CIS 4.1 unauthorized API calls alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_1, null)
+}
+
+output "alarm_name_cis_4_2" {
+  description = "Name of the CIS 4.2 console sign-in without MFA alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_2, null)
+}
+
+output "alarm_name_cis_4_3" {
+  description = "Name of the CIS 4.3 root account use alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_3, null)
+}
+
+output "alarm_name_cis_4_4" {
+  description = "Name of the CIS 4.4 IAM policy changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_4, null)
+}
+
+output "alarm_name_cis_4_5" {
+  description = "Name of the CIS 4.5 CloudTrail configuration changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_5, null)
+}
+
+output "alarm_name_cis_4_6" {
+  description = "Name of the CIS 4.6 console authentication failures alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_6, null)
+}
+
+output "alarm_name_cis_4_7" {
+  description = "Name of the CIS 4.7 CMK disable or scheduled deletion alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_7, null)
+}
+
+output "alarm_name_cis_4_8" {
+  description = "Name of the CIS 4.8 S3 bucket policy changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_8, null)
+}
+
+output "alarm_name_cis_4_9" {
+  description = "Name of the CIS 4.9 AWS Config changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_9, null)
+}
+
+output "alarm_name_cis_4_10" {
+  description = "Name of the CIS 4.10 security group changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_10, null)
+}
+
+output "alarm_name_cis_4_11" {
+  description = "Name of the CIS 4.11 NACL changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_11, null)
+}
+
+output "alarm_name_cis_4_12" {
+  description = "Name of the CIS 4.12 network gateway changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_12, null)
+}
+
+output "alarm_name_cis_4_13" {
+  description = "Name of the CIS 4.13 route table changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_13, null)
+}
+
+output "alarm_name_cis_4_14" {
+  description = "Name of the CIS 4.14 VPC changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_14, null)
+}
+
+output "alarm_name_cis_4_15" {
+  description = "Name of the CIS 4.15 AWS Organizations changes alarm. Null when logging or CIS alarms are disabled."
+  value       = try(module.cloudwatch_alarms[0].alarm_name_cis_4_15, null)
+}
+
 output "config_recorder_name" {
   description = "Name of the AWS Config recorder in us-east-1. Null when Config is disabled."
   value       = try(module.config_home[0].recorder_name, null)
