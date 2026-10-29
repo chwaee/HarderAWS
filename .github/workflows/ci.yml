@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+
+      - name: Format, init, and validate
+        run: ./tests/test_hcl.sh
+
+      - name: Install tflint
+        run: |
+          curl -fsSL -o /tmp/tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.65.0/tflint_linux_amd64.zip
+          sudo unzip -o /tmp/tflint.zip -d /usr/local/bin
+
+      - name: tflint
+        run: |
+          tflint --init --config tests/tflint.hcl
+          tflint --recursive --config "$PWD/tests/tflint.hcl"
+
+      - name: Install tfsec
+        run: |
+          curl -fsSL -o /tmp/tfsec https://github.com/aquasecurity/tfsec/releases/download/v1.28.14/tfsec-linux-amd64
+          sudo install -m 0755 /tmp/tfsec /usr/local/bin/tfsec
+
+      - name: tfsec
+        run: tfsec --config-file tests/tfsec.yaml --minimum-severity HIGH .

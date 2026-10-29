@@ -1,0 +1,13 @@
+# Copy this file to backend.tf after you have a bucket and lock table that
+# belong to the hardening pipeline. Leave application stacks on a different key.
+# This repository does not create the state bucket.
+#
+# terraform {
+#   backend "s3" {
+#     bucket         = "REPLACE_WITH_STATE_BUCKET"
+#     key            = "harderaws/terraform.tfstate"
+#     region         = "us-east-1"
+#     encrypt        = true
+#     dynamodb_table = "REPLACE_WITH_LOCK_TABLE"
+#   }
+# }

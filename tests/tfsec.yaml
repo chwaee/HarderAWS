@@ -1,0 +1,2 @@
+# No repository-wide excludes. Exceptions are tfsec:ignore comments on the resource.
+exclude: []
