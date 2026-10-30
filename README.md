@@ -6,6 +6,15 @@ This is a security posture layer. It creates policies, trails, security buckets,
 
 Author: Chwaee ([chwaee](https://github.com/chwaee), hello@appliedaiconsulting.io). License: MIT.
 
+## Related tools
+
+| Tool | Use it for |
+| --- | --- |
+| [aws-health-audit](https://github.com/chwaee/aws-health-audit) | Read-only AWS audit before you apply anything |
+| [tf-cost-preview](https://github.com/chwaee/tf-cost-preview) | Estimate monthly cost of this plan before apply |
+| [secure-ci-templates](https://github.com/chwaee/secure-ci-templates) | GitHub Actions workflows for client repos |
+| [appliedaiconsulting.io](https://appliedaiconsulting.io) | Consulting services |
+
 ## What it does
 
 | Module | What it creates | CIS v3.0.0 |
